@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+coverage/
+dist/
+submission/
+*.zip
+test-results/
+output/

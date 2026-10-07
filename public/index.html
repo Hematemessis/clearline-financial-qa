@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light"><title>清言 · 金融对话质检</title>
+  <link rel="stylesheet" href="/style.css"><script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/" aria-label="清言质检首页"><span class="brand-icon" aria-hidden="true">▦</span><strong>清言</strong></a><span class="breadcrumb">工作台<span>/</span>合规质检</span><div class="top-actions"><span class="local-tag">本地运行</span><button id="settings-open" class="button secondary"><span id="config-dot" class="dot"></span>模型设置</button></div></header>
+  <main>
+    <section class="workbar"><div><h1>销售对话质检</h1><p>逐项核验表达风险，关联原文证据。</p></div><div class="work-actions"><button id="export-btn" class="button secondary" disabled>导出报告 ↓</button><button id="analyze-btn" class="button primary"><span>开始质检</span><span aria-hidden="true">↗</span></button></div></section>
+    <div class="workspace">
+      <section class="panel input-panel" aria-labelledby="input-title">
+        <div class="panel-heading"><div><span class="section-symbol" aria-hidden="true">☷</span><h2 id="input-title">对话原文</h2></div><span class="small-label">单段分析</span></div>
+        <details class="scenario-box" open><summary>审核场景 <span class="muted">用于选择适用规则</span></summary><fieldset id="scenario-fields" class="scenario-fields"><label>产品类型<select id="product"><option value="unknown">未确定产品</option><option value="securities">证券业务</option><option value="fund">公募基金</option><option value="privatefund">私募基金</option><option value="other">其他金融产品（通用初筛）</option></select></label><label>沟通渠道<select id="channel"><option value="unknown">渠道不明</option><option value="online">网络沟通 / 营销</option><option value="offline">线下沟通</option></select></label><label>销售阶段<select id="stage"><option value="unknown">阶段不明</option><option value="introduction">产品介绍</option><option value="recommendation">主动推荐</option><option value="purchase">客户申请购买</option><option value="aftersale">售后服务</option></select></label><label>对话日期<input id="dialogue-date" type="date"></label></fieldset><p class="helper">不确定时保留默认项；仅对当前片段初筛，不能据此确认完整销售流程合规。</p></details>
+        <p class="helper input-help">每段发言独占一行，以“销售：”或“客户：”开头。格式错误会在提交前提示。</p>
+        <div class="sample-row"><span>载入样例</span><button class="sample-chip" data-sample="normal">正常沟通</button><button class="sample-chip" data-sample="violation">明确风险</button><button class="sample-chip" data-sample="badcase">易误判对话</button></div>
+        <div id="source-tabs" class="source-tabs" role="tablist" aria-label="对话查看方式" hidden><button id="edit-tab" role="tab" aria-selected="true" aria-controls="editor-pane">编辑文本</button><button id="review-tab" role="tab" aria-selected="false" aria-controls="review-pane" tabindex="-1">原文复核</button></div>
+        <div id="editor-pane" role="tabpanel" aria-labelledby="edit-tab">
+        <label for="dialogue" class="sr-only">销售与客户对话文本</label>
+        <textarea id="dialogue" maxlength="16000" spellcheck="false" placeholder="销售：这款产品历史表现比较稳定，但不代表未来收益。&#10;客户：能保证本金吗？&#10;销售：不能保证，投资存在亏损风险。"></textarea>
+        <div class="editor-footer"><span id="text-count">0 / 16,000 字符</span><div><button id="upload-btn" class="text-button">导入 TXT</button><input id="file-input" type="file" accept=".txt,text/plain" hidden><button id="clear-btn" class="text-button">清空</button></div></div>
+        </div>
+        <div id="review-pane" role="tabpanel" aria-labelledby="review-tab" hidden>
+          <div class="source-toolbar"><span>分析原文 · 基础脱敏</span><button id="return-to-risk" class="text-button" hidden>返回风险项 ↑</button></div>
+          <p id="source-location" class="source-location" role="status" aria-live="polite">点击右侧风险证据，定位对应发言。</p>
+          <div id="source-reader" class="source-reader" role="region" aria-label="本次分析的对话原文" tabindex="0"></div>
+        </div>
+        <div id="sample-expectation" class="sample-expectation" hidden></div>
+        <div class="privacy-note"><p>仅使用脱敏或自制对话。文本将发送至所配模型；本应用不保存对话与密钥。</p></div>
+        <div id="input-message" class="input-message" role="status" aria-live="polite"></div>
+      </section>
+      <section class="panel report-panel" aria-labelledby="report-title" aria-busy="false">
+        <div class="panel-heading"><div><span class="section-symbol" aria-hidden="true">▦</span><h2 id="report-title">质检矩阵</h2></div><span class="small-label">5 个检查维度</span></div>
+        <div id="report-status" class="status-line" role="status" aria-live="polite"><span class="status-led"></span><span>等待输入对话</span></div>
+        <div id="empty-report" class="empty-report"><div class="matrix-scroll"><table class="review-matrix empty-matrix"><caption class="sr-only">待分析的五个质检维度</caption><thead><tr><th scope="col">质检维度</th><th scope="col">结果</th><th scope="col">风险项</th><th scope="col">判断摘要</th></tr></thead><tbody><tr><th scope="row">收益与本金承诺</th><td>待分析</td><td>—</td><td>保本保收益、确定涨跌</td></tr><tr><th scope="row">宣传与风险揭示</th><td>待分析</td><td>—</td><td>夸大宣传、隐瞒或弱化风险</td></tr><tr><th scope="row">交易与账户安全</th><td>待分析</td><td>—</td><td>代客操作、索取账户凭证</td></tr><tr><th scope="row">客户适当性</th><td>待分析</td><td>—</td><td>风险匹配、身份与测评流程</td></tr><tr><th scope="row">信息与服务行为</th><td>待分析</td><td>—</td><td>敏感信息、不当服务表达</td></tr></tbody></table></div><div class="detail-empty"><span class="empty-index">—</span><h3>暂无质检结果</h3><p>输入对话后点击“开始质检”。<br>完成后，选择任一维度查看依据与建议。</p></div></div>
+        <div id="loading-report" class="loading-report" hidden><div class="spinner"></div><h3>正在分析对话</h3><p>模型理解语境后，系统将校验角色、证据与输出格式。</p><p id="elapsed" class="muted">已用 0 秒</p><button id="cancel-btn" class="button secondary">取消分析</button></div>
+        <div id="error-report" class="error-report" hidden><span class="error-icon">!</span><h3 id="error-title">分析未完成</h3><p id="error-detail"></p><button id="error-settings" class="button secondary">检查模型设置</button></div>
+        <div id="report-content" hidden></div>
+      </section>
+    </div>
+    <footer><span>辅助质检结果，由人工确认最终结论。</span><span>规则版本 2026-09-24.1<span class="footer-divider">·</span>本地工作台</span></footer>
+  </main>
+  <dialog id="settings-dialog" aria-labelledby="settings-title"><form id="settings-form"><div class="dialog-heading"><h2 id="settings-title">模型设置</h2><button type="button" id="settings-close" class="close-btn" aria-label="关闭设置">×</button></div><p class="helper">支持 OpenAI Compatible Chat Completions API。请仅连接你信任的模型服务。</p>
+    <label class="checkbox-label" id="env-option" hidden><input type="checkbox" id="use-env">使用本机 .env 完整配置（密钥不返回页面）</label>
+    <fieldset id="page-config"><label for="base-url">Base URL</label><input id="base-url" type="url" placeholder="https://api.openai.com/v1" autocomplete="off"><p class="field-hint">填写服务商提供的 API 根路径（包括 /v1 等前缀）。也支持完整 /chat/completions 地址。</p><label for="model-name">Model Name</label><input id="model-name" placeholder="填写服务商的模型 ID" autocomplete="off"><label for="api-key">API Key</label><div class="key-field"><input id="api-key" type="password" placeholder="输入你的 API Key" autocomplete="off" spellcheck="false"><button id="key-toggle" type="button" class="text-button" aria-label="显示密钥">显示</button></div></fieldset>
+    <p class="field-hint">例如 DeepSeek 的 Base URL 为 https://api.deepseek.com/v1。模型 ID 以你所用服务商的文档为准，不是产品展示名称。连接成功仅验证接口可达。</p><div class="settings-security">密钥仅保存在当前页面内存，刷新后清除；不会写入浏览器存储、日志或报告。请求只发送至所选模型地址，不跟随重定向。连接测试会产生一次小额模型调用。</div>
+    <div id="connection-message" role="status" aria-live="polite"></div><div class="dialog-actions"><button id="test-btn" type="button" class="button secondary">测试连接</button><button type="submit" class="button primary">应用配置</button></div>
+  </form></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body></html>

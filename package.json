@@ -1,0 +1,12 @@
+{
+  "name": "clearline-financial-qa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "本地金融销售对话合规质检工作台",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}
